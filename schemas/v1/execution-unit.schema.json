@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-sdlc.dev/schemas/v1/execution-unit.schema.json",
+  "title": "ExecutionUnit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "task_id",
+    "plan_id",
+    "step_id",
+    "schema_version",
+    "action",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "id": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "step_id": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "input_context": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "tool_calls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool", "status"],
+        "properties": {
+          "tool": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["requested", "completed", "failed"]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "output_artifact_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "done", "failed"]
+    }
+  }
+}

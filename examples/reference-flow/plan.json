@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "id": "plan-docs-001",
+  "task_id": "task-docs-001",
+  "steps": [
+    {
+      "id": "step-1",
+      "description": "Rewrite the README and move strategy and spec docs into their canonical locations.",
+      "depends_on": [],
+      "status": "done"
+    }
+  ],
+  "success_criteria": [
+    "The repository entrypoint is clear.",
+    "The spec and strategy are easy to find."
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-sdlc.dev/schemas/v1/artifact.schema.json",
+  "title": "Artifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "schema_version",
+    "type",
+    "location",
+    "metadata"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["source_code", "test", "documentation", "config", "report", "diff"]
+    },
+    "location": {
+      "type": "string"
+    },
+    "content": {
+      "type": ["string", "null"]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

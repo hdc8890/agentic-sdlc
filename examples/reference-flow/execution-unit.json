@@ -1,0 +1,20 @@
+{
+  "schema_version": "v1",
+  "id": "exec-docs-001",
+  "task_id": "task-docs-001",
+  "plan_id": "plan-docs-001",
+  "step_id": "step-1",
+  "action": "Update repository documentation structure.",
+  "input_context": {
+    "current_files": ["README.md", "docs/specs/agentic-sdlc-v1.md", "docs/strategy/platform-alignment.md"]
+  },
+  "tool_calls": [
+    {
+      "tool": "apply_patch",
+      "status": "completed",
+      "trace_id": "trace-docs-001"
+    }
+  ],
+  "output_artifact_ids": ["artifact-docs-001"],
+  "status": "done"
+}

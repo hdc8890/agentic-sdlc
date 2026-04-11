@@ -1,318 +1,75 @@
-# Agentic SDLC Specification (v1)
+# Agentic SDLC Platform
 
-## Overview
+This repository defines a **framework-agnostic Agentic SDLC model** and the supporting contracts needed for autonomous and semi-autonomous systems to participate in software delivery.
 
-The Agentic SDLC defines a standardized model for how autonomous and semi-autonomous agents participate in the software development lifecycle.
+It is organized to keep three things separate:
 
-This specification establishes:
+1. **Normative platform contracts**: the shared semantic model and versioned schemas.
+2. **Layer-specific guidance**: orchestration, capabilities, and experience boundaries.
+3. **Reference implementations**: examples that prove the model without becoming the standard.
 
-* Core abstractions
-* Execution lifecycle
-* System boundaries
-* Contracts between orchestration, memory, and evaluation systems
+## Start here
 
-This is a **framework-agnostic specification**.
+- Platform strategy: [`docs/strategy/platform-alignment.md`](docs/strategy/platform-alignment.md)
+- Core spec: [`docs/specs/agentic-sdlc-v1.md`](docs/specs/agentic-sdlc-v1.md)
+- Layer interaction overview: [`docs/architecture/layers-overview.md`](docs/architecture/layers-overview.md)
+- Cross-layer contracts: [`docs/specs/interface-contracts.md`](docs/specs/interface-contracts.md)
+- Evaluation and promotion model: [`docs/specs/evaluation-promotion.md`](docs/specs/evaluation-promotion.md)
+- Governance and conformance: [`governance/README.md`](governance/README.md)
+- Reference flow example: [`examples/reference-flow/README.md`](examples/reference-flow/README.md)
 
----
+## Repository layout
 
-## Core Principles
-
-1. **Framework Agnostic**
-
-   * Orchestration engines (LangGraph, AutoGen, custom) must conform to this model, not define it.
-
-2. **Composable**
-
-   * Each component (planning, execution, evaluation, memory) is independently replaceable.
-
-3. **Observable**
-
-   * All agent actions must be traceable, inspectable, and auditable.
-
-4. **Progressive Autonomy**
-
-   * Systems must support increasing levels of autonomy with human oversight.
-
----
-
-## Core Abstractions
-
-### 1. Task
-
-A Task represents a unit of work derived from the SDLC.
-
-Examples:
-
-* Feature implementation
-* Bug fix
-* Refactor
-* KTLO (keep-the-lights-on)
-
-**Schema (conceptual):**
-
-```
-Task {
-  id
-  type
-  description
-  acceptance_criteria
-  priority
-  constraints
-}
+```text
+/
+  README.md
+  docs/
+    strategy/
+    specs/
+    architecture/
+    decisions/
+  layers/
+    semantic/
+    orchestration/
+    capabilities/
+    experience/
+  schemas/
+    v1/
+  examples/
+    reference-flow/
+    adapters/
+  governance/
 ```
 
----
+## Layer model
 
-### 2. Plan
+### Semantic
 
-A Plan is a structured decomposition of a Task into executable steps.
+Defines the shared language of the platform: `Task`, `Plan`, `ExecutionUnit`, `Artifact`, `Evaluation`, `Memory`, and `Promotion`.
 
-**Properties:**
+### Orchestration
 
-* Ordered or DAG-based
-* May include conditional branches
-* Can be iteratively refined
+Executes workflows, manages state transitions, coordinates retries, and determines when replanning is required.
 
-```
-Plan {
-  steps[]
-  dependencies[]
-  success_criteria
-}
-```
+### Capabilities
 
----
+Provides shared services such as memory, evaluation, and tool integrations.
 
-### 3. Execution Unit
+### Experience
 
-The smallest actionable unit performed by an agent.
+Defines how human users and developer-facing surfaces interact with the platform through CLIs, UIs, and workflows.
 
-Examples:
+## What this repo is not
 
-* Generate code
-* Modify file
-* Write test
-* Query system
+- It is **not** a mandate for a single orchestration framework.
+- It is **not** a production implementation of every layer.
+- It is **not** a UI specification.
 
-```
-ExecutionUnit {
-  input_context
-  action
-  tool_calls[]
-  output_artifacts[]
-}
-```
+## Near-term direction
 
----
+The current focus is to:
 
-### 4. Artifact
-
-Artifacts are outputs produced during execution.
-
-Types:
-
-* Source code
-* Test files
-* Documentation
-* Config changes
-
-```
-Artifact {
-  type
-  location
-  content
-  metadata
-}
-```
-
----
-
-### 5. Evaluation
-
-Evaluation determines whether outputs meet quality standards.
-
-Types:
-
-* Test execution
-* Static analysis
-* LLM-based critique
-* Diff scoring
-
-```
-Evaluation {
-  result (pass/fail)
-  score
-  feedback
-  retryable (boolean)
-}
-```
-
----
-
-### 6. Memory
-
-Memory provides context across execution.
-
-Layers:
-
-* **Ephemeral**: current step context
-* **Session**: task-level context
-* **Persistent**: org-level knowledge
-
-```
-Memory {
-  context
-  embeddings
-  history
-}
-```
-
----
-
-### 7. Promotion
-
-Promotion represents progression toward production readiness.
-
-Stages:
-
-* Draft
-* PR Created
-* Approved
-* Merged
-* Deployed
-
----
-
-## Execution Lifecycle
-
-### 1. Task Ingestion
-
-* Input from ticketing system or manual trigger
-
-### 2. Planning
-
-* Task → Plan decomposition
-* May involve iterative refinement
-
-### 3. Execution Loop
-
-```
-while not complete:
-  execute step
-  evaluate result
-  
-  if fail:
-    retry or replan
-```
-
----
-
-### 4. Evaluation Gate
-
-* All artifacts must pass defined evaluation criteria
-* Includes:
-
-  * Tests
-  * Linting
-  * Heuristic checks
-  * Risk scoring
-
----
-
-### 5. Promotion
-
-* Create PR
-* Attach artifacts
-* Provide summary + reasoning
-* Human or automated approval
-
----
-
-## System Layers
-
-### 1. Semantic Layer (This Spec)
-
-Defines shared abstractions.
-
----
-
-### 2. Orchestration Layer
-
-Responsible for:
-
-* Workflow execution
-* State transitions
-* Retry logic
-
----
-
-### 3. Capability Layer
-
-Shared services:
-
-* Memory system
-* Tool integrations (Git, CI, Jira)
-* Evaluation engine
-
----
-
-### 4. Experience Layer
-
-User-facing systems:
-
-* CLI
-* UI
-* Developer workflows
-
----
-
-## Autonomy Levels
-
-1. **Assistive**
-
-   * Human-driven with agent suggestions
-
-2. **Semi-Autonomous**
-
-   * Agent executes, human approves
-
-3. **Autonomous (Bounded)**
-
-   * Agent operates within constraints
-
-4. **Fully Autonomous**
-
-   * End-to-end execution without intervention
-
----
-
-## Non-Goals (v1)
-
-* Defining a specific orchestration framework
-* Locking into a specific memory implementation
-* Defining UI/UX patterns
-
----
-
-## Future Extensions
-
-* Multi-agent coordination protocols
-* Cross-task learning
-* Organizational memory graphs
-* Risk-aware deployment strategies
-
----
-
-## Summary
-
-The Agentic SDLC provides:
-
-* A shared language
-* A modular architecture
-* A foundation for convergence across teams
-
-This enables:
-
-* Interoperability
-* Reusability
-* Scalable autonomy
+1. stabilize the semantic layer as versioned contracts
+2. define the interfaces between layers
+3. add one thin end-to-end reference flow
+4. establish governance for compatibility and evolution

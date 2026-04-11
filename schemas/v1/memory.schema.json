@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-sdlc.dev/schemas/v1/memory.schema.json",
+  "title": "Memory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "schema_version",
+    "scope",
+    "context",
+    "history"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "id": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["ephemeral", "session", "persistent"]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "embeddings": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "number"
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}

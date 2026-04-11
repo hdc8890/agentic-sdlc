@@ -1,0 +1,19 @@
+{
+  "schema_version": "v1",
+  "id": "task-docs-001",
+  "type": "docs",
+  "description": "Reorganize the repository to clarify the Agentic SDLC platform structure.",
+  "acceptance_criteria": [
+    "The repository has a clear README.",
+    "The spec and strategy docs live in predictable locations.",
+    "The layer model is visible and documented."
+  ],
+  "priority": "high",
+  "constraints": [
+    "Do not lock the platform to a single orchestration framework."
+  ],
+  "metadata": {
+    "submitted_by": "human",
+    "autonomy_level": "semi-autonomous"
+  }
+}

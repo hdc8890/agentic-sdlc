@@ -1,0 +1,12 @@
+{
+  "schema_version": "v1",
+  "id": "artifact-docs-001",
+  "type": "documentation",
+  "location": "README.md",
+  "content": null,
+  "metadata": {
+    "trace_id": "trace-docs-001",
+    "generated_by": "agent",
+    "purpose": "repository-entrypoint"
+  }
+}
