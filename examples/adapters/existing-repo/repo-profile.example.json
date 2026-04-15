@@ -1,48 +1,53 @@
 {
   "schema_version": "v1",
-  "id": "repo-profile-docs-platform",
+  "id": "repo-profile-meal-planner",
   "repository": {
-    "owner": "example-org",
-    "name": "existing-platform-repo",
+    "owner": "davidchen",
+    "name": "meal-planner",
     "default_branch": "main"
   },
   "ecosystems": [
-    "markdown",
-    "json",
-    "node"
+    "rust",
+    "sqlite",
+    "node",
+    "typescript",
+    "react"
   ],
   "working_roots": [
-    "docs",
-    "schemas",
-    "examples"
+    "src",
+    "tests",
+    "frontend",
+    "templates",
+    "plans"
   ],
   "important_paths": [
+    "Cargo.toml",
     "README.md",
-    "AGENTS.md",
-    "docs/specs",
-    "governance"
+    "src",
+    "tests",
+    "frontend/package.json",
+    "templates"
   ],
   "protected_paths": [
     ".github",
-    "governance"
+    ".claude",
+    ".copilot",
+    ".squad",
+    "meal_planner.db",
+    "target"
   ],
   "commands": {
-    "test": "node scripts/validate-docs.js",
-    "lint": "markdownlint docs README.md",
-    "build": "node scripts/build-site.js"
+    "test": "cargo test",
+    "lint": "cargo fmt --check && cargo clippy && cd frontend && npm run lint",
+    "build": "cargo build --release && cd frontend && npm run build"
   },
   "ci": {
-    "provider": "github-actions",
-    "required_checks": [
-      "docs-validation",
-      "schema-validation"
-    ]
+    "provider": "github-actions"
   },
   "pull_request": {
-    "provider": "github",
-    "required_approvals": 1
+    "provider": "github"
   },
   "metadata": {
-    "notes": "Example profile only; commands are illustrative."
+    "notes": "Derived from the observed meal-planner repository structure. Commands reflect the current Rust backend and frontend package setup."
   }
 }

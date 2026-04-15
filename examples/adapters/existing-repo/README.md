@@ -1,31 +1,33 @@
 # Existing repo adapter example
 
-This example shows how the platform can describe and work with an **existing repository**.
+This example uses **`meal-planner`** as the first concrete brownfield target.
 
-It is intentionally narrow:
+`meal-planner` is an existing repository with:
 
-1. describe a target repo with a `repo-profile`
-2. plan a bounded change against existing files
-3. use repo-native validation commands
-4. reflect readiness through platform evaluation and promotion records
+- a Rust backend managed with Cargo
+- a Vite/React frontend under `frontend/`
+- GitHub-hosted source control and workflows
+- repo-native validation commands across multiple ecosystems
 
-## Why this example exists
+## Scope
 
-The greenfield reference flow proves the clean semantic model. This example proves how the same model can be applied to a repo that already has:
+The example is intentionally narrow:
 
-- its own file layout
-- its own test and build commands
-- its own CI and PR process
+1. describe the target repo with a `repo-profile`
+2. expose safe working roots and protected areas
+3. capture repo-native validation commands
+4. provide enough context for planning and promotion decisions
 
 ## Files
 
 - `repo-profile.example.json`
 
-## Example use
+## Why this example exists
 
-The adapter profile can be used by an orchestration layer to:
+The greenfield reference flow proves the clean semantic model. This example proves that the same model can be applied to a real repo that already has its own structure, tooling, and workflow boundaries.
 
-- discover safe working roots
-- avoid protected paths
-- run canonical repo validation commands
-- understand PR and CI requirements before promotion
+## Notes
+
+- The profile is based on the current observed structure of `meal-planner`.
+- It is still an **example**, not a claim that every brownfield repo should look like this.
+- Some governance values, such as exact required approvals or required checks, are intentionally left minimal unless they are directly visible in the target repo.

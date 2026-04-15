@@ -47,6 +47,10 @@ The platform should wrap and coordinate those realities rather than replacing th
 - show one bounded change from task through promotion state
 - demonstrate repo inspection, constrained execution, and repo-native evaluation
 
+Initial target:
+
+- `meal-planner`, a brownfield repo with a Rust backend, a Vite/React frontend, GitHub workflows, and repo-native Cargo/npm validation commands
+
 ### Phase 4: Layer backfill
 
 - update orchestration, capabilities, and experience guidance based on what the example proves
