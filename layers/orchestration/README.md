@@ -8,6 +8,7 @@ The orchestration layer coordinates workflow execution against the semantic mode
 - execution state management
 - retries and replanning
 - coordination of capability calls
+- honoring repo adapter constraints during brownfield execution
 
 ## Contract boundary
 

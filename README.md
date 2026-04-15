@@ -13,6 +13,8 @@ It is organized to keep three things separate:
 - Platform strategy: [`docs/strategy/platform-alignment.md`](docs/strategy/platform-alignment.md)
 - Core spec: [`docs/specs/agentic-sdlc-v1.md`](docs/specs/agentic-sdlc-v1.md)
 - Layer interaction overview: [`docs/architecture/layers-overview.md`](docs/architecture/layers-overview.md)
+- Brownfield integration: [`docs/architecture/brownfield-integration.md`](docs/architecture/brownfield-integration.md)
+- Roadmap and planning: [`docs/roadmap/README.md`](docs/roadmap/README.md)
 - Cross-layer contracts: [`docs/specs/interface-contracts.md`](docs/specs/interface-contracts.md)
 - Evaluation and promotion model: [`docs/specs/evaluation-promotion.md`](docs/specs/evaluation-promotion.md)
 - Governance and conformance: [`governance/README.md`](governance/README.md)
@@ -28,6 +30,7 @@ It is organized to keep three things separate:
     specs/
     architecture/
     decisions/
+    roadmap/
   layers/
     semantic/
     orchestration/
@@ -71,5 +74,6 @@ The current focus is to:
 
 1. stabilize the semantic layer as versioned contracts
 2. define the interfaces between layers
-3. add one thin end-to-end reference flow
-4. establish governance for compatibility and evolution
+3. document brownfield integration for existing repositories
+4. add a reusable roadmap and planning practice inside the repo
+5. expand examples from greenfield reference flow into brownfield adoption paths

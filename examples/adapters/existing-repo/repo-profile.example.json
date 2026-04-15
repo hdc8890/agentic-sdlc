@@ -1,0 +1,48 @@
+{
+  "schema_version": "v1",
+  "id": "repo-profile-docs-platform",
+  "repository": {
+    "owner": "example-org",
+    "name": "existing-platform-repo",
+    "default_branch": "main"
+  },
+  "ecosystems": [
+    "markdown",
+    "json",
+    "node"
+  ],
+  "working_roots": [
+    "docs",
+    "schemas",
+    "examples"
+  ],
+  "important_paths": [
+    "README.md",
+    "AGENTS.md",
+    "docs/specs",
+    "governance"
+  ],
+  "protected_paths": [
+    ".github",
+    "governance"
+  ],
+  "commands": {
+    "test": "node scripts/validate-docs.js",
+    "lint": "markdownlint docs README.md",
+    "build": "node scripts/build-site.js"
+  },
+  "ci": {
+    "provider": "github-actions",
+    "required_checks": [
+      "docs-validation",
+      "schema-validation"
+    ]
+  },
+  "pull_request": {
+    "provider": "github",
+    "required_approvals": 1
+  },
+  "metadata": {
+    "notes": "Example profile only; commands are illustrative."
+  }
+}

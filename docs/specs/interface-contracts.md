@@ -40,6 +40,7 @@ Required capability categories:
 - **memory**: retrieve and persist contextual state
 - **evaluation**: score outputs and return pass/fail plus retryability
 - **tooling**: execute external integrations such as Git, CI, or ticketing systems
+- **repo adapters**: expose existing-repo metadata, constraints, and validation surfaces for brownfield workflows
 
 Required properties for capability calls:
 
@@ -47,6 +48,18 @@ Required properties for capability calls:
 - explicit output payload
 - trace identifier
 - failure mode and retry guidance
+
+### Brownfield repo adapter contract
+
+For existing-repo workflows, the orchestration layer may depend on a repo adapter that provides:
+
+- a repo profile with stable metadata
+- working roots and important paths
+- protected paths and approval hints
+- canonical validation commands
+- changed file and CI/PR context
+
+When the repo profile is exchanged as a machine-readable contract, it should conform to `schemas/v1/repo-profile.schema.json`.
 
 ## Capabilities to orchestration
 
@@ -73,6 +86,7 @@ Minimum request contract:
 - constraints
 - approval mode or autonomy level
 - relevant user and session context
+- repo selection or repo profile reference for brownfield execution
 
 ## Orchestration to experience
 
@@ -83,6 +97,7 @@ User-facing outputs should expose:
 - evaluation outcomes
 - promotion readiness
 - human decisions required, if any
+- brownfield-specific constraints such as protected paths or required approvals when they affect execution
 
 ## Traceability and audit
 

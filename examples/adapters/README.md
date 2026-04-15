@@ -1,9 +1,10 @@
 # Adapter Examples
 
-This directory is reserved for framework-specific adapters that demonstrate conformance to the shared contracts.
+This directory holds adapters that demonstrate how the platform can conform to different execution environments without redefining the shared contracts.
 
 Examples may include:
 
+- existing repository adapters
 - LangGraph adapter
 - custom runtime adapter
 - enterprise workflow adapter
