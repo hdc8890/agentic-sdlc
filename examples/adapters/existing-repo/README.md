@@ -22,6 +22,8 @@ The example is intentionally narrow:
 
 - `repo-profile.example.json`
 - `task.json`
+- `execution-request.json`
+- `execution-session.json`
 - `plan.json`
 - `execution-unit.json`
 - `artifact.json`
@@ -44,6 +46,7 @@ The current proof slice models a bounded frontend task in `meal-planner`:
 
 - target file: `frontend/src/routes/shopping-list/index.tsx`
 - task: improve the shopping-list empty state so it directs users to generate a meal plan
+- execution request: consume `task.json` with the meal-planner repo profile and brownfield execution policy
 - validation: repo-native lint, build, and test commands represented through the repo profile
 
 This gives the repository one concrete brownfield path from task intake through promotion readiness.

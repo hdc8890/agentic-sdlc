@@ -34,6 +34,8 @@ The platform does not replace the target repository's code layout, CI pipeline, 
 5. Repo-native commands and CI results are collected as evaluation evidence.
 6. Promotion state reflects the repo's actual PR and approval model.
 
+In practice, this means the orchestration layer consumes `task.json` plus repo profile context and turns them into a plan, execution units, and evaluation-ready outputs.
+
 ## Repo adapter role
 
 The repo adapter is the capability-layer boundary between the platform and the target repository.
