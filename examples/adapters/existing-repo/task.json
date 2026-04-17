@@ -1,0 +1,24 @@
+{
+  "schema_version": "v1",
+  "id": "task-meal-planner-001",
+  "type": "feature",
+  "description": "Improve the shopping-list empty state in meal-planner so users are guided to generate a meal plan before returning to the shopping list.",
+  "acceptance_criteria": [
+    "The empty shopping-list state explains that shopping items depend on a generated meal plan.",
+    "The empty state includes a clear call to action that routes users toward meal-plan generation.",
+    "The change stays within existing brownfield constraints and avoids protected paths.",
+    "Repo-native validation commands can be attached as evaluation evidence."
+  ],
+  "priority": "medium",
+  "constraints": [
+    "Limit the change to existing frontend routes and shared UI components in meal-planner.",
+    "Do not modify protected paths such as .github, .claude, .copilot, .squad, meal_planner.db, or target.",
+    "Preserve the existing Rust backend and Cargo-managed workflows."
+  ],
+  "metadata": {
+    "target_repo_profile_id": "repo-profile-meal-planner",
+    "target_repo": "meal-planner",
+    "autonomy_level": "semi-autonomous",
+    "surface": "brownfield-existing-repo"
+  }
+}

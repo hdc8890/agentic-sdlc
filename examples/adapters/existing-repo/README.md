@@ -21,6 +21,12 @@ The example is intentionally narrow:
 ## Files
 
 - `repo-profile.example.json`
+- `task.json`
+- `plan.json`
+- `execution-unit.json`
+- `artifact.json`
+- `evaluation.json`
+- `promotion.json`
 
 ## Why this example exists
 
@@ -31,3 +37,13 @@ The greenfield reference flow proves the clean semantic model. This example prov
 - The profile is based on the current observed structure of `meal-planner`.
 - It is still an **example**, not a claim that every brownfield repo should look like this.
 - Some governance values, such as exact required approvals or required checks, are intentionally left minimal unless they are directly visible in the target repo.
+
+## Proof slice
+
+The current proof slice models a bounded frontend task in `meal-planner`:
+
+- target file: `frontend/src/routes/shopping-list/index.tsx`
+- task: improve the shopping-list empty state so it directs users to generate a meal plan
+- validation: repo-native lint, build, and test commands represented through the repo profile
+
+This gives the repository one concrete brownfield path from task intake through promotion readiness.

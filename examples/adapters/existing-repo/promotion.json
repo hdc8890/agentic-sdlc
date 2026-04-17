@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "id": "promo-meal-planner-001",
+  "task_id": "task-meal-planner-001",
+  "stage": "ready_for_pr",
+  "readiness": "ready",
+  "blocking_issues": [],
+  "required_approvals": [
+    "meal-planner-maintainer-review"
+  ],
+  "granted_approvals": [],
+  "summary": "The meal-planner brownfield proof slice is ready for PR review with repo-native validation evidence attached.",
+  "artifacts": [
+    "artifact-meal-planner-001"
+  ],
+  "updated_at": "2026-04-16T00:44:28Z"
+}

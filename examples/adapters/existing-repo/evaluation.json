@@ -1,0 +1,22 @@
+{
+  "schema_version": "v1",
+  "id": "eval-meal-planner-001",
+  "target_artifact_ids": [
+    "artifact-meal-planner-001"
+  ],
+  "result": "pass",
+  "score": 0.92,
+  "feedback": [
+    "The proof slice stays within the frontend working root and does not require protected-path access.",
+    "The empty-state change is aligned with the meal-planner route structure and directs users toward an existing meal-plan flow.",
+    "Repo-native validation can be attached using the commands defined by the repo profile."
+  ],
+  "retryable": false,
+  "risk_level": "low",
+  "evidence": [
+    "Target repo profile identifies frontend as a safe working root and .github/.claude/.copilot/.squad/meal_planner.db/target as protected paths.",
+    "Canonical validation commands are available: cargo test; cargo fmt --check && cargo clippy && cd frontend && npm run lint; cargo build --release && cd frontend && npm run build.",
+    "The planned change references real meal-planner files: frontend/src/routes/shopping-list/index.tsx and frontend/src/routes/meal-plans/index.tsx."
+  ],
+  "evaluated_at": "2026-04-16T00:44:28Z"
+}
