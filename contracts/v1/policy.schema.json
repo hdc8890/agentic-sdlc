@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-sdlc.dev/contracts/v1/policy.schema.json",
+  "title": "TeamPolicy",
+  "description": "Team-level policy configuration for the Agentic SDLC framework. Lives in each repo at .agentic/policy.json and controls autonomy level, approval requirements, and guardrails.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "autonomy_level",
+    "require_human_review_on"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "autonomy_level": {
+      "type": "string",
+      "enum": ["assistive", "semi_autonomous", "bounded_autonomous", "fully_autonomous"],
+      "description": "Default autonomy level for tasks in this repo. Can be overridden per task type. Start with 'assistive' or 'semi_autonomous' for most teams."
+    },
+    "require_human_review_on": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string",
+        "enum": [
+          "all_changes",
+          "schema_changes",
+          "dependency_changes",
+          "config_changes",
+          "security_related",
+          "protected_path_changes",
+          "evaluation_failures",
+          "new_files",
+          "deletions"
+        ]
+      },
+      "description": "Conditions that always require a human to review before promotion proceeds."
+    },
+    "auto_merge": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the orchestrator may auto-merge PRs when all checks pass and required approvals are satisfied. Default false."
+    },
+    "max_execution_steps": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 50,
+      "default": 10,
+      "description": "Maximum number of execution steps allowed per task. Guards against runaway plans."
+    },
+    "task_type_overrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Per-task-type autonomy overrides. For example, allow 'docs' tasks to run fully autonomously while 'feature' tasks stay semi-autonomous.",
+      "properties": {
+        "feature": { "$ref": "#/$defs/task_policy" },
+        "bugfix": { "$ref": "#/$defs/task_policy" },
+        "refactor": { "$ref": "#/$defs/task_policy" },
+        "ktlo": { "$ref": "#/$defs/task_policy" },
+        "research": { "$ref": "#/$defs/task_policy" },
+        "docs": { "$ref": "#/$defs/task_policy" }
+      }
+    },
+    "notification_channels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "target"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["github_pr_comment", "slack", "email"]
+          },
+          "target": {
+            "type": "string",
+            "description": "Channel, email address, or GitHub team slug."
+          },
+          "on_events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["task_started", "evaluation_failed", "promotion_blocked", "promotion_ready", "task_complete"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "task_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "autonomy_level": {
+          "type": "string",
+          "enum": ["assistive", "semi_autonomous", "bounded_autonomous", "fully_autonomous"]
+        },
+        "require_human_review_on": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "v1",
+  "autonomy_level": "semi_autonomous",
+  "require_human_review_on": [
+    "protected_path_changes",
+    "security_related",
+    "dependency_changes",
+    "schema_changes"
+  ],
+  "auto_merge": false,
+  "max_execution_steps": 10,
+  "task_type_overrides": {
+    "docs": {
+      "autonomy_level": "bounded_autonomous",
+      "require_human_review_on": []
+    },
+    "ktlo": {
+      "autonomy_level": "bounded_autonomous",
+      "require_human_review_on": ["protected_path_changes"]
+    }
+  },
+  "notification_channels": [
+    {
+      "type": "github_pr_comment",
+      "target": "meal-planner-team",
+      "on_events": ["evaluation_failed", "promotion_blocked", "promotion_ready"]
+    }
+  ]
+}

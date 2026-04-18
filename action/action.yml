@@ -1,0 +1,68 @@
+name: 'Agentic SDLC'
+description: 'Validate and manage Agentic SDLC configuration for your repository'
+author: 'agentic-sdlc'
+
+inputs:
+  command:
+    description: 'CLI command to run: validate | profile-generate | status'
+    required: true
+    default: 'validate'
+  autonomy_level:
+    description: 'Initial autonomy level for init command: assistive | semi_autonomous | bounded_autonomous | fully_autonomous'
+    required: false
+    default: 'semi_autonomous'
+  working_directory:
+    description: 'Repository root directory'
+    required: false
+    default: '.'
+
+outputs:
+  profile_path:
+    description: 'Path to the generated or validated .agentic/profile.json'
+    value: ${{ steps.run.outputs.profile_path }}
+  validation_passed:
+    description: 'Whether validation passed (true/false)'
+    value: ${{ steps.run.outputs.validation_passed }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Agentic SDLC CLI
+      shell: bash
+      run: npm install -g @agentic-sdlc/cli
+
+    - name: Run agentic command
+      id: run
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        case "${{ inputs.command }}" in
+          validate)
+            agentic validate --dir .
+            echo "validation_passed=true" >> $GITHUB_OUTPUT
+            ;;
+          profile-generate)
+            agentic profile --generate
+            echo "profile_path=$(pwd)/.agentic/profile.json" >> $GITHUB_OUTPUT
+            ;;
+          init)
+            agentic init --autonomy ${{ inputs.autonomy_level }}
+            echo "profile_path=$(pwd)/.agentic/profile.json" >> $GITHUB_OUTPUT
+            ;;
+          status)
+            agentic status
+            ;;
+          *)
+            echo "Unknown command: ${{ inputs.command }}"
+            exit 1
+            ;;
+        esac
+
+branding:
+  icon: 'cpu'
+  color: 'blue'

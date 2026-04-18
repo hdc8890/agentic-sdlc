@@ -1,0 +1,31 @@
+{
+  "schema_version": "v1",
+  "id": "meal-planner",
+  "repository": {
+    "owner": "your-org",
+    "name": "meal-planner",
+    "default_branch": "main"
+  },
+  "ecosystems": ["rust", "node"],
+  "working_roots": [".", "frontend"],
+  "protected_paths": [
+    "/.github/workflows/*",
+    "/Cargo.lock",
+    "/frontend/package-lock.json",
+    "/migrations/*",
+    "/src/auth/*"
+  ],
+  "commands": {
+    "test": "cargo test && npm --prefix frontend test",
+    "lint": "cargo clippy -- -D warnings && npm --prefix frontend run lint",
+    "build": "cargo build --release && npm --prefix frontend run build"
+  },
+  "ci": {
+    "provider": "github_actions",
+    "required_checks": ["test", "lint", "build"]
+  },
+  "pull_request": {
+    "provider": "github",
+    "required_approvals": 1
+  }
+}
