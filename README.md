@@ -17,17 +17,17 @@ The platform reads these files before doing anything in your repo. If they don't
 
 **Get started:** [Team Onboarding Guide](docs/onboarding/team-onboarding.md)
 
-## Tools
+## CLI
 
-| Tool | What it does |
-|---|---|
-| [`agentic` CLI](cli/README.md) | Scaffold `.agentic/`, auto-detect repo context, validate contracts |
-| [GitHub Action](action/README.md) | Validate `.agentic/` config in CI — catches schema drift on every push |
+The [`agentic` CLI](cli/README.md) helps teams scaffold, discover, and validate `.agentic/` configuration during the onboarding process.
 
 ```bash
-# Validate .agentic/ locally
 npm install -g @agentic-sdlc/cli
-agentic validate
+
+agentic init                  # Scaffold .agentic/ with starter files
+agentic profile --generate    # Auto-detect ecosystems, commands, protected paths
+agentic validate              # Validate against the contracts
+agentic status                # Show current configuration
 ```
 
 ## Platform architecture
@@ -71,7 +71,6 @@ The platform moves work from human intent through to shipped code. Each phase bo
   README.md
   AGENTS.md
   cli/                    # agentic CLI source
-  action/                 # GitHub Action source (validation only)
   contracts/
     v1/                   # Versioned JSON schemas (the contracts)
   docs/
@@ -107,7 +106,7 @@ The platform uses four layers. Only the first two are needed for initial adoptio
 - **Semantic** — shared vocabulary: Task, Plan, ExecutionUnit, Artifact, Evaluation, Memory, Promotion
 - **Orchestration** — executes plans, manages retries, coordinates capability services
 - **Capabilities** — memory, evaluation, and tool services used by the orchestrator
-- **Experience** — CLI, GitHub Action, and developer-facing surfaces (this repo)
+- **Experience** — CLI and developer-facing surfaces (this repo)
 
 See [`docs/architecture/layers-overview.md`](docs/architecture/layers-overview.md) for detail.
 

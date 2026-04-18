@@ -69,4 +69,4 @@ git add .agentic/
 git commit -m "chore: onboard to Agentic SDLC framework"
 ```
 
-Or use the GitHub Action for CI-driven onboarding — see [action/README.md](../../action/README.md).
+See the [Team Onboarding Guide](../../docs/onboarding/team-onboarding.md) for the full walkthrough.

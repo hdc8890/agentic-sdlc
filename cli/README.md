@@ -8,7 +8,7 @@ The `agentic` CLI is how teams onboard their repositories to the Agentic SDLC fr
 npm install -g @agentic-sdlc/cli
 ```
 
-Or use the [GitHub Action](../action/README.md) for CI integration without a global install.
+See the [Team Onboarding Guide](../docs/onboarding/team-onboarding.md) for the full adoption walkthrough.
 
 ## Commands
 

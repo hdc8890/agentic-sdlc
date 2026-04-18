@@ -2,12 +2,12 @@
 
 ## Project overview
 
-This repository is the **Agentic SDLC platform** — the CLI, GitHub Action, and versioned contracts that engineering teams use to onboard their repositories to AI-driven workflows. It publishes tools that teams install and contracts that platform services (orchestration engine, memory service) consume.
+This repository is the **Agentic SDLC platform** — the CLI and versioned contracts that engineering teams use to onboard their repositories to AI-driven workflows. It publishes tools that teams install and contracts that platform services (orchestration engine, memory service) consume.
 
 The repo contains three things:
 
 - **`contracts/v1/`** — versioned JSON schemas that define the shared data model
-- **`cli/` and `action/`** — the tools teams install to onboard and stay valid
+- **`cli/`** — the CLI tool teams use to onboard and validate configuration
 - **`docs/` and `examples/`** — onboarding guide, architecture, and reference examples
 
 If you are editing this repository, optimize for **making it easy for a team to onboard their repo** and for **keeping contracts accurate and stable**.
@@ -49,10 +49,6 @@ The `agentic` CLI. TypeScript/Node.js. Commands:
 - `agentic status` — show current configuration and task state
 
 Changes here must remain compatible with the contracts in `contracts/v1/`.
-
-### `action/`
-
-GitHub Action wrapper around the CLI. Allows CI-driven onboarding without a global install. `action/action.yml` is the action definition.
 
 ### `contracts/`
 

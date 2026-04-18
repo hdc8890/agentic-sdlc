@@ -62,5 +62,5 @@ export const initCommand = new Command('init')
     console.log('  1. Run `agentic profile --generate` to auto-discover your repo context');
     console.log('  2. Review and customize .agentic/profile.json');
     console.log('  3. Adjust .agentic/policy.json to match your team\'s autonomy preferences');
-    console.log('  4. Commit .agentic/ and add the GitHub Action (see action/README.md)');
+    console.log('  4. Commit .agentic/ to your repo');
   });
