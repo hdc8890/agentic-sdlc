@@ -53,6 +53,13 @@
         "type": "string"
       }
     },
+    "evaluation_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of the Evaluation records that informed this promotion decision."
+    },
     "summary": {
       "type": "string"
     },

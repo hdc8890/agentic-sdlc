@@ -47,6 +47,32 @@
         "type": "string"
       }
     },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Traceability link to the external system where this task originated.",
+      "required": ["system", "external_id"],
+      "properties": {
+        "system": {
+          "type": "string",
+          "description": "The intake source system (e.g., jira, github_issues, slack, api, manual)."
+        },
+        "external_id": {
+          "type": "string",
+          "description": "The identifier in the source system (e.g., JIRA ticket key, GH issue number)."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Direct URL to the original work item."
+        }
+      }
+    },
+    "resolved_autonomy_level": {
+      "type": "string",
+      "enum": ["assistive", "semi_autonomous", "bounded_autonomous", "fully_autonomous"],
+      "description": "The effective autonomy level for this task, resolved during triage from the repo policy and task type overrides. Set by the orchestration engine, not the intake adapter."
+    },
     "metadata": {
       "type": "object",
       "additionalProperties": true

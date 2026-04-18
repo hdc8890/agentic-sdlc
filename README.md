@@ -33,29 +33,37 @@ agentic validate
 
 ## Platform architecture
 
-```
-┌─────────────────────────────────────────────────────┐
-│  agentic-sdlc (this repo)                           │
-│  Publishes: CLI, GitHub Action, contracts           │
-└──────────────────────┬──────────────────────────────┘
-                       │
-        ┌──────────────┼──────────────┐
-        ▼              ▼              ▼
- Team A repo      Team B repo    Team C repo
- .agentic/        .agentic/      .agentic/
- profile.json     profile.json   profile.json
- policy.json      policy.json    policy.json
-        │              │              │
-        └──────────────┼──────────────┘
-                       ▼
-         ┌─────────────────────────┐
-         │  Platform services      │
-         │  ├─ Orchestration engine│
-         │  └─ Memory service      │
-         └─────────────────────────┘
-```
+The platform moves work from human intent through to shipped code. Each phase boundary is defined by a contract.
 
-The orchestration engine and memory service are separate deployments. This repo defines the contracts they consume and the tools teams use to produce valid configuration.
+**[End-to-end flow →](docs/architecture/end-to-end-flow.md)** — Full pipeline: Intake → Triage → Planning → Execution → Evaluation → Promotion → Completion
+
+**[Autonomy levels →](docs/architecture/autonomy-levels.md)** — Concrete definitions for assistive, semi-autonomous, bounded-autonomous, and fully-autonomous with gate matrices
+
+```
+  JIRA / GH Issues / Slack / API
+            │
+      ┌─────▼──────┐
+      │   Intake    │  → Task contract (normalized, with source traceability)
+      └─────┬──────┘
+      ┌─────▼──────┐
+      │   Triage    │  → Task (enriched: resolved_autonomy_level from policy)
+      └─────┬──────┘
+      ┌─────▼──────┐
+      │  Planning   │  → Plan contract   ← GATE (depends on autonomy level)
+      └─────┬──────┘
+      ┌─────▼──────┐
+      │ Execution   │  → ExecutionUnit + Artifact contracts
+      └─────┬──────┘
+      ┌─────▼──────┐
+      │ Evaluation  │  → Evaluation contract   ← GATE on failure (all levels)
+      └─────┬──────┘
+      ┌─────▼──────┐
+      │ Promotion   │  → PR → Review → Merge   ← GATE (depends on autonomy level)
+      └─────┬──────┘
+      ┌─────▼──────┐
+      │ Completion  │  → Memory updated, source system synced
+      └────────────┘
+```
 
 ## Repository layout
 
@@ -69,7 +77,7 @@ The orchestration engine and memory service are separate deployments. This repo 
     v1/                   # Versioned JSON schemas (the contracts)
   docs/
     onboarding/           # Team adoption guide
-    architecture/         # Layer model, brownfield integration
+    architecture/         # End-to-end flow, autonomy levels, layer model
     decisions/            # Architecture decision records
   examples/
     onboarded-repo/       # What a real .agentic/ looks like after onboarding
@@ -84,12 +92,12 @@ All versioned contracts live in [`contracts/v1/`](contracts/v1/):
 |---|---|
 | `profile.schema.json` | Repo identity, commands, ecosystems, protected paths |
 | `policy.schema.json` | Autonomy level, human review requirements, per-task overrides |
-| `task.schema.json` | Work item flowing into the orchestration engine |
+| `task.schema.json` | Work item with source traceability and resolved autonomy level |
 | `plan.schema.json` | Decomposed execution steps for a task |
 | `execution-unit.schema.json` | Single step of a plan being executed |
 | `artifact.schema.json` | Output produced by an execution step |
 | `evaluation.schema.json` | Pass/fail evidence for an artifact |
-| `promotion.schema.json` | Promotion readiness state through PR/merge stages |
+| `promotion.schema.json` | Promotion readiness state with evaluation references |
 | `memory.schema.json` | Context stored and retrieved by the memory service |
 
 ## Layer model
