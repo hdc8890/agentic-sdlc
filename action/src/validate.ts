@@ -33,7 +33,7 @@ export async function validateAgenticDir(
         results.push({
           file: check.file,
           valid: false,
-          errors: [`Required file not found. Run the onboard or profile-generate command first.`],
+          errors: [`Required file not found. This repo may not have been onboarded yet.`],
           skipped: false
         });
       } else {

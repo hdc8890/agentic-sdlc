@@ -1,6 +1,14 @@
 # End-to-end flow
 
-This document describes the full pipeline from the moment a human creates a work request through to the shipped output. Every phase boundary is marked by a contract from `contracts/v1/`. Human gates are determined by the repo's autonomy level (see [autonomy-levels.md](./autonomy-levels.md)).
+This document describes the full pipeline from the moment a human creates a work request through to the shipped output. Every phase boundary is marked by a contract from `contracts/v1/`. Human gates are determined by the domain's autonomy level (see [autonomy-levels.md](./autonomy-levels.md)).
+
+## Key concepts
+
+**Domain**: The primary unit of onboarding. A domain is a bounded area of the business (e.g., "Payments", "Identity", "Notifications") that typically spans multiple repositories. Domains carry their own tribal knowledge, cross-repo dependencies, and ownership. See `contracts/v1/domain.schema.json`.
+
+**Onboarding**: A manual process. Domains have years of accumulated tribal knowledge, outdated documentation, and implicit conventions that must be captured by humans working with the teams. Automation comes after onboarding, not during.
+
+**State storage**: Project and domain state lives in a queryable store (vector DB or similar), not in JIRA or git repositories. JIRA remains an intake channel. The state store must support AI agent queries at scale — an agent processing a task needs to retrieve relevant domain context, prior task history, and cross-repo dependencies efficiently.
 
 ---
 
@@ -56,7 +64,7 @@ This document describes the full pipeline from the moment a human creates a work
 
 **Input:** Raw request from JIRA, GitHub Issues, Slack, an API call, or manual entry.
 
-**Output:** `Task` contract — with a new `source` block for traceability.
+**Output:** `Task` contract — with a `source` block for traceability.
 
 ```json
 {
@@ -82,46 +90,39 @@ An ingestion adapter reads from the external system and produces a Task. The ada
 - Preserving the `source` link so the original ticket is always traceable
 - Deduplicating — if PAY-1234 was already ingested, skip or update
 
-Adapters are intentionally separate from this repo. A JIRA adapter, a GitHub Issues adapter, and a Slack adapter are each their own integration. This repo defines the Task contract they all produce.
+Adapters are intentionally source-specific. A JIRA adapter, a GitHub Issues adapter, and a Slack adapter are each their own integration. This repo defines the Task contract they all produce.
 
-**Why this replaces JIRA as source of truth:**
+**JIRA's role changes:**
 
-JIRA remains an intake channel, but project state moves to the pipeline. The Task contract becomes the canonical representation. Status updates flow back to JIRA (or whatever system) via the adapter, but the framework owns the lifecycle state. This eliminates the "every team configured JIRA differently" problem — all teams emit the same Task contract regardless of which intake system they use.
-
-**Who builds this:**
-
-- Ingestion adapters: built per-source (JIRA adapter, GH Issues adapter, etc.)
-- The orchestration engine (Principal #1) likely hosts the adapter runtime or exposes an API that adapters POST to
+JIRA remains an intake channel but is no longer the source of truth for project state. The Task contract becomes the canonical representation. Status updates can flow back to JIRA via the adapter, but the pipeline owns the lifecycle. This eliminates the "every team configured JIRA differently" problem — all domains emit the same Task contract regardless of their intake system.
 
 ---
 
 ## Phase 2: Triage
 
-**Purpose:** Classify the task, resolve its effective autonomy level, and determine routing.
+**Purpose:** Classify the task, resolve its effective autonomy level, route it to the correct domain and repo(s).
 
-**Input:** `Task` contract + the target repo's `.agentic/policy.json`
+**Input:** `Task` contract + `Domain` contract + repo `Policy`
 
 **Output:** `Task` contract enriched with `resolved_autonomy_level`
 
 **How it works:**
 
-1. Read the repo's policy (`.agentic/policy.json`)
-2. Check if `task_type_overrides` has a specific autonomy level for this task type
-3. If yes, use the override. If no, use the repo's default `autonomy_level`
-4. Set `resolved_autonomy_level` on the Task
-5. At Level 0 (assistive), a human must manually confirm classification and priority
+1. Identify which domain and repo(s) the task targets — using the Domain contract's repo list and the task description
+2. Read the domain's policy and any repo-level policy overrides
+3. Check if `task_type_overrides` has a specific autonomy level for this task type
+4. If yes, use the override. If no, use the default `autonomy_level`
+5. Set `resolved_autonomy_level` on the Task
+6. At Level 0 (assistive), a human must manually confirm classification and priority
 
 ```
 Task.type = "bugfix"
-Policy.autonomy_level = "semi_autonomous"
+Domain policy → autonomy_level = "semi_autonomous"
 Policy.task_type_overrides.bugfix.autonomy_level = "bounded_autonomous"
 → resolved_autonomy_level = "bounded_autonomous"
 ```
 
-**Who builds this:**
-
-- Triage logic lives in the orchestration engine (Principal #1)
-- It reads `.agentic/policy.json` from the team's repo
+For multi-repo tasks, triage also determines whether the task should be decomposed into sub-tasks per repo or executed as a coordinated cross-repo change.
 
 ---
 
@@ -129,17 +130,18 @@ Policy.task_type_overrides.bugfix.autonomy_level = "bounded_autonomous"
 
 **Purpose:** Decompose the task into an ordered set of steps with dependencies.
 
-**Input:** `Task` (triaged) + `.agentic/profile.json` (repo context) + `Memory` (relevant history)
+**Input:** `Task` (triaged) + `Domain` (cross-repo context, tribal knowledge) + repo `Profile` + `Memory` (relevant history)
 
 **Output:** `Plan` contract
 
 **How it works:**
 
-1. The planning agent receives the Task and repo Profile
-2. Memory service (Principal #2) provides relevant context — past similar tasks, known patterns, repo conventions
+1. The planning agent receives the Task, Domain context, and repo Profile(s)
+2. The memory store provides relevant context — past similar tasks, known patterns, domain conventions, tribal knowledge captured during onboarding
 3. The agent produces a Plan: ordered steps with descriptions and dependencies
-4. At Levels 0 and 1, a human must approve the plan before execution begins
-5. At Level 2, human approves plans for `feature` and `refactor` types only
+4. For multi-repo tasks, the plan may include steps that span repos with explicit dependency ordering (e.g., "update shared library in `common-lib` before updating `payment-service`")
+5. At Levels 0 and 1, a human must approve the plan before execution begins
+6. At Level 2, human approves plans for `feature` and `refactor` types only
 
 ```json
 {
@@ -154,11 +156,6 @@ Policy.task_type_overrides.bugfix.autonomy_level = "bounded_autonomous"
   "success_criteria": ["All tests pass", "No changes to public API"]
 }
 ```
-
-**Who builds this:**
-
-- Planning is a capability of the orchestration engine (Principal #1)
-- Memory retrieval is handled by the memory service (Principal #2)
 
 ---
 
@@ -179,12 +176,6 @@ Policy.task_type_overrides.bugfix.autonomy_level = "bounded_autonomous"
 5. The repo's `max_execution_steps` from policy.json is enforced — if exceeded, escalate to human
 6. At Level 0, the human performs each step manually (agent only advises)
 
-**Who builds this:**
-
-- Execution is managed by the orchestration engine (Principal #1)
-- The actual agent runtime (Copilot, custom agent, etc.) does the work
-- Memory service stores execution context for future reference
-
 ---
 
 ## Phase 5: Evaluation
@@ -197,7 +188,7 @@ Policy.task_type_overrides.bugfix.autonomy_level = "bounded_autonomous"
 
 **How it works:**
 
-1. Run the repo's own validation commands from `.agentic/profile.json`:
+1. Run the repo's own validation commands from the repo Profile:
    - `commands.test` → run the test suite
    - `commands.lint` → run the linter
    - `commands.build` → verify it builds
@@ -220,11 +211,6 @@ Policy.task_type_overrides.bugfix.autonomy_level = "bounded_autonomous"
   "evaluated_at": "2026-04-18T12:00:00Z"
 }
 ```
-
-**Who builds this:**
-
-- Evaluation runs in CI or the orchestration engine
-- It calls the repo's own commands (no custom test runner needed)
 
 ---
 
@@ -264,11 +250,6 @@ Policy.task_type_overrides.bugfix.autonomy_level = "bounded_autonomous"
 }
 ```
 
-**Who builds this:**
-
-- PR creation and merge logic lives in the orchestration engine or a promotion service
-- GitHub API integration for PR creation, review requests, merge
-
 ---
 
 ## Phase 7: Completion
@@ -277,23 +258,17 @@ Policy.task_type_overrides.bugfix.autonomy_level = "bounded_autonomous"
 
 **Input:** `Promotion` (merged/deployed) + all prior contracts
 
-**Output:** Updated `Memory` contract + task status closed
+**Output:** Updated `Memory` + task status closed
 
 **How it works:**
 
-1. Mark the Task as complete
-2. Store execution context in Memory service for future reference:
+1. Mark the Task as complete in the state store
+2. Persist execution context to memory for future reference:
    - What worked (successful patterns)
    - What failed and how it was resolved (retry/replan history)
-   - Repo-specific conventions learned
+   - Domain-specific conventions learned
 3. Sync status back to the source system (close the JIRA ticket, close the GH Issue)
 4. Emit metrics: time-to-completion, autonomy level used, evaluation pass rate, number of retries
-
-**Who builds this:**
-
-- Memory persistence: memory service (Principal #2)
-- Source system sync: ingestion adapters (reverse direction)
-- Metrics: platform observability (TBD)
 
 ---
 
@@ -341,27 +316,60 @@ See [autonomy-levels.md](./autonomy-levels.md) for full definitions.
                     Task contract
                           │
   ┌───────────────────────▼────────────────────────────────────────┐
-  │  Orchestration engine (Principal #1)                           │
+  │  Orchestration engine                                          │
   │                                                                │
   │  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────────┐  │
   │  │  Triage  │→ │ Planning │→ │ Execution │→ │  Promotion   │  │
   │  └──────────┘  └──────────┘  └───────────┘  └──────────────┘  │
   │       ↕              ↕             ↕              ↕            │
   │  ┌─────────────────────────────────────────────────────────┐   │
-  │  │  Policy enforcement (reads .agentic/policy.json)        │   │
+  │  │  Policy enforcement (reads domain + repo policy)        │   │
   │  │  Gate checks at each phase boundary                     │   │
   │  └─────────────────────────────────────────────────────────┘   │
-  └────────────────────────┬───────────────────────────────────────┘
-                           │
-              ┌────────────┼────────────┐
-              ↓            ↓            ↓
-  ┌───────────────┐ ┌────────────┐ ┌──────────────────────────┐
-  │ Memory svc    │ │ Team repos │ │ CI / GitHub API          │
-  │ (Principal #2)│ │ .agentic/  │ │ (test, lint, build,      │
-  │ Vector DB     │ │ profile +  │ │  PR create, merge)       │
-  │ Context store │ │ policy     │ │                          │
-  └───────────────┘ └────────────┘ └──────────────────────────┘
+  └────────────┬───────────────────────┬───────────────────────────┘
+               │                       │
+               ↓                       ↓
+  ┌────────────────────────┐  ┌────────────────────────────────────┐
+  │  State store           │  │  Domain repos                      │
+  │  (vector DB)           │  │                                    │
+  │                        │  │  payments/                         │
+  │  ┌──────────────────┐  │  │    payment-service/.agentic/       │
+  │  │ Domain context   │  │  │    payment-gateway/.agentic/       │
+  │  │ Task history     │  │  │    billing-api/.agentic/           │
+  │  │ Tribal knowledge │  │  │                                    │
+  │  │ Execution memory │  │  │  identity/                         │
+  │  │ Project state    │  │  │    auth-service/.agentic/          │
+  │  └──────────────────┘  │  │    user-service/.agentic/          │
+  └────────────────────────┘  └────────────────────────────────────┘
 ```
+
+---
+
+## Onboarding vs. day-to-day operation
+
+### Onboarding (manual, per domain)
+
+Onboarding a domain is a human-driven knowledge capture process. It is not automated because:
+- Domains carry years of tribal knowledge that no tool can discover automatically
+- Existing documentation is often out of date or wrong
+- Cross-repo dependencies and deployment ordering are implicit and known only by the team
+- The policy choices (autonomy level, protected paths, review requirements) require team input
+
+The onboarding process produces:
+1. **Domain contract** (`domain.schema.json`) — repos, ownership, cross-repo deps, tribal knowledge
+2. **Repo profiles** (`.agentic/profile.json` per repo) — commands, ecosystems, protected paths
+3. **Repo policies** (`.agentic/policy.json` per repo) — autonomy level, review requirements
+4. **State store entries** — domain context and captured knowledge seeded into the vector DB
+
+### Day-to-day operation (agent-driven phase transitions)
+
+After onboarding, AI agents drive phase transitions. An agent processing a task:
+1. Queries the state store for domain context, task history, and tribal knowledge
+2. Reads the relevant repo profiles and policies
+3. Transitions through phases, respecting the gates defined by the autonomy level
+4. Persists results back to the state store
+
+Phase transitions are agent-driven, not CI-pipeline-driven. The 80/20 rule applies — agents should handle the common case and escalate the rest to humans.
 
 ---
 
@@ -369,7 +377,7 @@ See [autonomy-levels.md](./autonomy-levels.md) for full definitions.
 
 JIRA becomes one of several intake adapters, not the source of truth. The benefits:
 
-1. **Standardized intake**: Every team's work enters the pipeline as the same Task contract, regardless of how their JIRA project is configured
-2. **Pipeline owns state**: Task status, plan progress, evaluation results, and promotion stage live in the framework — JIRA shows a synced view
+1. **Standardized intake**: Every domain's work enters the pipeline as the same Task contract, regardless of how their JIRA project is configured
+2. **Pipeline owns state**: Task status, plan progress, evaluation results, and promotion stage live in the state store — JIRA shows a synced view
 3. **Gradual migration**: Teams can keep using JIRA for intake while the framework proves itself. Once trust is established, teams can switch to GH Issues or direct API intake
 4. **Configuration mess is irrelevant**: JIRA field mappings are the adapter's problem. The framework doesn't care if Team A uses "Story Points" and Team B uses "T-shirt Sizes" — the adapter normalizes to priority and type

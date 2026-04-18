@@ -1,36 +1,21 @@
-name: 'Agentic SDLC'
-description: 'Validate and manage Agentic SDLC configuration for your GitHub repository'
+name: 'Agentic SDLC Validate'
+description: 'Validates .agentic/ configuration files against the Agentic SDLC contracts. Use in CI to ensure repo profiles and policies stay well-formed after onboarding.'
 author: 'agentic-sdlc'
 
 inputs:
-  command:
-    description: 'Command to run: validate | profile-generate | onboard'
+  config_dir:
+    description: 'Path to the .agentic/ directory relative to the repo root'
     required: false
-    default: 'validate'
-  autonomy_level:
-    description: 'Autonomy level for onboard command: assistive | semi_autonomous | bounded_autonomous | fully_autonomous'
-    required: false
-    default: 'semi_autonomous'
-  repo_token:
-    description: 'GitHub token used for opening PRs (onboard command only). Use secrets.GITHUB_TOKEN.'
-    required: false
-    default: ''
+    default: '.agentic'
 
 outputs:
   validation_passed:
     description: 'true if all .agentic/ files passed schema validation'
-    value: ${{ steps.action.outputs.validation_passed }}
-  profile_generated:
-    description: 'true if a profile was written or updated'
-    value: ${{ steps.action.outputs.profile_generated }}
-  profile_path:
-    description: 'Absolute path to .agentic/profile.json in the workspace'
-    value: ${{ steps.action.outputs.profile_path }}
 
 runs:
   using: 'node20'
   main: 'dist/index.js'
 
 branding:
-  icon: 'cpu'
+  icon: 'check-circle'
   color: 'blue'
