@@ -76,7 +76,6 @@ The platform moves work from human intent through to shipped code. Each phase bo
   docs/
     onboarding/           # Team adoption guide
     architecture/         # End-to-end flow, autonomy levels, layer model
-    decisions/            # Architecture decision records
   examples/
     onboarded-repo/       # What a real .agentic/ looks like after onboarding
   governance/             # Ownership and working group
