@@ -4,7 +4,7 @@ A framework for integrating AI-driven workflows into existing engineering teams.
 
 ## How teams adopt this
 
-Adoption starts with **domain onboarding** — a manual, collaborative process that captures tribal knowledge, maps repositories, and establishes cross-repo dependencies. Each domain produces a domain contract and per-repo configuration:
+Adoption starts with **domain onboarding** — a collaborative process that captures tribal knowledge, maps repositories, and establishes cross-repo dependencies. Each domain produces a domain contract and per-repo configuration:
 
 ```
 your-repo/
@@ -15,7 +15,21 @@ your-repo/
 
 The platform reads these files before doing anything in your repo. If they don't exist, nothing runs.
 
-**Get started:** [Team Onboarding Guide](docs/onboarding/team-onboarding.md)
+### Human onboarding
+
+Follow the step-by-step guide to install the CLI, scaffold configuration, and tune it with your team.
+
+**→ [Team Onboarding Guide](docs/onboarding/team-onboarding.md)**
+
+### AI agent onboarding
+
+If you have an AI coding agent (Copilot, Cursor, Cline, etc.), you can have it handle the entire onboarding. Copy and paste this prompt to your agent:
+
+> Onboard this repository to the Agentic SDLC platform. Read the agent onboarding guide at `docs/onboarding/agent-onboarding.md` in the [agentic-sdlc repo](https://github.com/hdc8890/agentic-sdlc) and follow every step. Install the `@agentic-sdlc/cli`, scaffold `.agentic/`, auto-detect the repo profile, review and tune the generated files, then validate and commit. Do not guess the GitHub org, notification channels, or protected paths — ask me if you're unsure.
+
+That's it. The agent guide has the exact steps, schemas, decision logic, and stop conditions your agent needs.
+
+**→ [Agent Onboarding Guide](docs/onboarding/agent-onboarding.md)**
 
 ## CLI
 
