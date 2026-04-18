@@ -23,11 +23,9 @@ Follow the step-by-step guide to install the CLI, scaffold configuration, and tu
 
 ### AI agent onboarding
 
-If you have an AI coding agent (Copilot, Cursor, Cline, etc.), you can have it handle the entire onboarding. Copy and paste this prompt to your agent:
+Point your AI coding agent at the agent onboarding guide and it will handle the rest:
 
-> Onboard this repository to the Agentic SDLC platform. Read the agent onboarding guide at `docs/onboarding/agent-onboarding.md` in the [agentic-sdlc repo](https://github.com/hdc8890/agentic-sdlc) and follow every step. Install the `@agentic-sdlc/cli`, scaffold `.agentic/`, auto-detect the repo profile, review and tune the generated files, then validate and commit. Do not guess the GitHub org, notification channels, or protected paths — ask me if you're unsure.
-
-That's it. The agent guide has the exact steps, schemas, decision logic, and stop conditions your agent needs.
+> Onboard this repo to the Agentic SDLC platform by following `docs/onboarding/agent-onboarding.md` in the [agentic-sdlc repo](https://github.com/hdc8890/agentic-sdlc).
 
 **→ [Agent Onboarding Guide](docs/onboarding/agent-onboarding.md)**
 
