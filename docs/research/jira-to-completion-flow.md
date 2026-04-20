@@ -8,18 +8,22 @@ It is intentionally illustrative rather than normative. The exact API and payloa
 
 ## Overview
 
-```text
-JIRA webhook or cron
-  -> intake adapter
-  -> engine API
-  -> intake
-  -> triage
-  -> planning
-  -> execution
-  -> evaluation
-  -> promotion
-  -> completion
-  -> update JIRA
+```mermaid
+flowchart LR
+    J[JIRA webhook or cron] --> A[Intake adapter]
+    A --> API[Engine API]
+    API --> T[Triage]
+    T --> P[Planning]
+    P --> G1{Plan gate?}
+    G1 -->|approved or not required| E[Execution]
+    E --> V[Evaluation]
+    V --> G2{Eval gate?}
+    G2 -->|approved or not required| R[Promotion]
+    R --> C[Completion]
+    C --> U[Update JIRA]
+
+    CFG[Repo profile + policy] -.-> API
+    DOM[Domain context] -.-> API
 ```
 
 In this model:
