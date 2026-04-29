@@ -2,7 +2,7 @@
   "schema_version": "v1",
   "id": "meal-planner",
   "repository": {
-    "owner": "your-org",
+    "owner": "hdc8890",
     "name": "meal-planner",
     "default_branch": "main"
   },
@@ -10,10 +10,9 @@
   "working_roots": [".", "frontend"],
   "protected_paths": [
     "/.github/workflows/*",
+    "/.agentic/*",
     "/Cargo.lock",
-    "/frontend/package-lock.json",
-    "/migrations/*",
-    "/src/auth/*"
+    "/frontend/package-lock.json"
   ],
   "commands": {
     "test": "cargo test && npm --prefix frontend test",
