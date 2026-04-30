@@ -1,0 +1,40 @@
+{
+  "schema_version": "v1",
+  "id": "meal-planner",
+  "name": "Meal Planner",
+  "description": "Personal meal planning, recipe management, and grocery list generation. Single-repo domain: Rust Axum API + CLI plus a React/TanStack frontend served from the same repo.",
+  "repositories": [
+    {
+      "id": "hdc8890/meal-planner",
+      "name": "meal-planner",
+      "role": "primary",
+      "notes": "Workspace contains both the Rust backend (src/, tests/) and the frontend (frontend/). Profile declares two working_roots."
+    }
+  ],
+  "ownership": {
+    "team": "hdc8890",
+    "domain_experts": ["hdc8890"]
+  },
+  "shared_conventions": {
+    "branching_strategy": "trunk-based",
+    "release_process": "Tag-driven via GitHub releases.",
+    "testing_philosophy": "Integration tests in tests/ exercise services and API end-to-end via sqlx + axum::test.",
+    "notes": [
+      "Zero-warning policy: cargo clippy must pass with -D warnings.",
+      "Use thiserror for errors; prefer ? over .unwrap() in library code.",
+      "No ORM — services call sqlx with raw SQL."
+    ]
+  },
+  "external_dependencies": [
+    {
+      "name": "TheMealDB",
+      "type": "api",
+      "notes": "Optional source for seed recipes. Not required for local dev."
+    },
+    {
+      "name": "SQLite",
+      "type": "database",
+      "notes": "Default backend. The sqlx layer is Postgres-ready; placeholders would need ? → $N translation."
+    }
+  ]
+}
