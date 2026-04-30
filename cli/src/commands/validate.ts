@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import chalk from 'chalk';
-import Ajv from 'ajv';
+import Ajv from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 
 const ajv = new Ajv({ strict: false });
