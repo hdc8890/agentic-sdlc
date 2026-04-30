@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-sdlc.dev/schemas/v1/codebase-index.schema.json",
+  "title": "CodebaseIndexManifest",
+  "description": "The persisted fingerprint of a codebase index produced by a capability-layer indexing service. Captures a Merkle tree over (file -> chunks) so that consumers can detect what has changed without re-reading content. The manifest is the contract; the underlying chunking, embedding, and vector storage are implementation details of the capability service.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "index_id",
+    "repo_id",
+    "ref",
+    "root_hash",
+    "hash_algorithm",
+    "created_at",
+    "updated_at",
+    "files"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v1"
+    },
+    "index_id": {
+      "type": "string",
+      "description": "Stable identifier for this (repo_id, ref) index. Opaque to consumers.",
+      "minLength": 1
+    },
+    "repo_id": {
+      "type": "string",
+      "description": "Stable repo slug, typically '<owner>/<name>'. Tenancy boundary for the capability service.",
+      "minLength": 1
+    },
+    "ref": {
+      "type": "object",
+      "description": "Git ref this index represents. Either a branch (with optional resolved commit) or an explicit commit.",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["branch", "commit", "tag"]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit_sha": {
+          "type": "string",
+          "description": "Resolved commit SHA at index time. Required for kind=commit; optional otherwise.",
+          "pattern": "^[0-9a-f]{7,64}$"
+        }
+      }
+    },
+    "root_hash": {
+      "type": "string",
+      "description": "Merkle root over the sorted (path, file_hash) pairs in `files`. Stable across runs given identical inputs.",
+      "minLength": 1
+    },
+    "hash_algorithm": {
+      "type": "string",
+      "description": "Hash algorithm used for all leaf and interior nodes in the Merkle tree.",
+      "enum": ["sha256", "blake3"]
+    },
+    "embedder": {
+      "type": "object",
+      "description": "Identifies the embedding model used so consumers can detect compatibility. Optional because some artifacts (e.g., FTS-only indexes) have no embedding.",
+      "additionalProperties": false,
+      "required": ["name", "dim"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Provider-qualified model id, e.g., 'sentence-transformers/BAAI/bge-small-en-v1.5'."
+        },
+        "dim": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "normalized": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "chunker": {
+      "type": "object",
+      "description": "Identifies the chunking strategy used to derive chunks from files. Required when `files[*].chunks` is present.",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "e.g., 'tree-sitter-structural', 'fixed-size'."
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "stats": {
+      "type": "object",
+      "description": "Optional summary counters; not part of the integrity hash.",
+      "additionalProperties": false,
+      "properties": {
+        "file_count": { "type": "integer", "minimum": 0 },
+        "chunk_count": { "type": "integer", "minimum": 0 },
+        "skipped_count": { "type": "integer", "minimum": 0 },
+        "total_bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "files": {
+      "type": "array",
+      "description": "Per-file entries, sorted by `path`. The Merkle root is computed deterministically from this list.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "file_hash"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Repo-relative POSIX path.",
+            "minLength": 1
+          },
+          "file_hash": {
+            "type": "string",
+            "description": "Merkle root over `chunks` if present; otherwise the content hash of the file bytes."
+          },
+          "language": {
+            "type": ["string", "null"],
+            "description": "Detected language id (tree-sitter grammar name) or null if unknown."
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "chunks": {
+            "type": "array",
+            "description": "Optional chunk descriptors. Omitted for artifacts that index whole files only.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["chunk_id", "span", "hash"],
+              "properties": {
+                "chunk_id": {
+                  "type": "string",
+                  "description": "Stable identifier within this file; typically '<file_hash>:<index>' or a node hash."
+                },
+                "span": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["start_byte", "end_byte"],
+                  "properties": {
+                    "start_byte": { "type": "integer", "minimum": 0 },
+                    "end_byte": { "type": "integer", "minimum": 0 },
+                    "start_line": { "type": "integer", "minimum": 1 },
+                    "end_line": { "type": "integer", "minimum": 1 }
+                  }
+                },
+                "hash": {
+                  "type": "string",
+                  "description": "Content hash of the chunk bytes."
+                },
+                "kind": {
+                  "type": "string",
+                  "description": "Optional structural label, e.g., 'function', 'class', 'block'."
+                },
+                "symbol": {
+                  "type": "string",
+                  "description": "Optional fully-qualified symbol name extracted by the chunker."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
